@@ -19,8 +19,8 @@ export default defineConfig({
         background_color: '#141414',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/one-night/',
+        start_url: '/one-night/',
         lang: 'ru',
         icons: [
           {
