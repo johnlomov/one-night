@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="One Night maskable icon">
+  <rect width="512" height="512" fill="#141414"/>
+  <circle cx="256" cy="256" r="190" fill="#1f1f1f"/>
+  <path d="M397 116c-35 8-67 26-91 54-45 52-42 128 8 176 20 20 46 33 73 37-35 25-78 39-125 33-91-12-155-94-143-185 12-90 94-154 185-142 34 4 66 14 93 27Z" fill="#f0c76e"/>
+  <path d="M172 307c22 33 59 53 101 53 28 0 53-9 74-24-15 41-54 70-99 70-58 0-105-47-105-105 0-23 7-44 20-62 0 23 3 46 9 68Z" fill="#f7f2e8" opacity=".92"/>
+  <circle cx="334" cy="174" r="19" fill="#f7f2e8"/>
+</svg>

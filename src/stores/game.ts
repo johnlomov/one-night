@@ -84,7 +84,7 @@ export const useGameStore = defineStore('game', {
     playerCount: 3,
     playerNames: createDefaultPlayerNames(3),
     delayBetweenRoles: 10_000,
-    discussionDuration: 20,
+    discussionDuration: 300,
     nightQueue: [],
     currentActionIndex: 0,
     votes: {},
