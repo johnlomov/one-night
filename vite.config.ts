@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/app-icon.svg', 'icons/maskable-icon.svg'],
       manifest: {
-        name: 'One Night Ultimate Werewolf',
+        name: 'One Night',
         short_name: 'One Night',
         description: 'Ведущий, таймеры и голосование для One Night Ultimate Werewolf.',
         theme_color: '#141414',
@@ -24,13 +24,13 @@ export default defineConfig({
         lang: 'ru',
         icons: [
           {
-            src: '/icons/app-icon.svg',
+            src: '/one-night/icons/app-icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any',
           },
           {
-            src: '/icons/maskable-icon.svg',
+            src: '/one-night/icons/maskable-icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'maskable',
