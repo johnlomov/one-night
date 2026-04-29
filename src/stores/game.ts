@@ -18,14 +18,29 @@ export interface NightAction {
   instruction: string
 }
 
+export interface Player {
+  id: string
+  name: string
+}
+
+export interface VotingResult {
+  eliminatedPlayerIds: string[]
+  maxVotes: number
+  tally: Record<string, number>
+}
+
 interface GameState {
   phase: GamePhase
   selectedRoles: string[]
   playerCount: number
+  playerNames: string[]
   delayBetweenRoles: number
   discussionDuration: number
   nightQueue: NightAction[]
   currentActionIndex: number
+  votes: Record<string, string>
+  votingResult: VotingResult | null
+  finalPlayerRoles: Record<string, string>
 }
 
 function createRecommendedRoles(requiredRoleCount: number) {
@@ -58,17 +73,30 @@ function createRandomRoles(requiredRoleCount: number) {
   return selectedRoleIds
 }
 
+function createDefaultPlayerNames(playerCount: number) {
+  return Array.from({ length: playerCount }, (_, index) => `Игрок ${index + 1}`)
+}
+
 export const useGameStore = defineStore('game', {
   state: (): GameState => ({
     phase: 'setup',
     selectedRoles: [...defaultSelectedRoleIds],
     playerCount: 3,
+    playerNames: createDefaultPlayerNames(3),
     delayBetweenRoles: 10_000,
-    discussionDuration: 300,
+    discussionDuration: 20,
     nightQueue: [],
     currentActionIndex: 0,
+    votes: {},
+    votingResult: null,
+    finalPlayerRoles: {},
   }),
   getters: {
+    players: (state): Player[] =>
+      Array.from({ length: state.playerCount }, (_, index) => ({
+        id: `player-${index + 1}`,
+        name: state.playerNames[index]?.trim() || `Игрок ${index + 1}`,
+      })),
     requiredRoleCount: (state) => state.playerCount + 3,
     selectedRoleCount: (state) => state.selectedRoles.length,
     selectedRoleCounts: (state) =>
@@ -97,8 +125,40 @@ export const useGameStore = defineStore('game', {
     canStartGame(): boolean {
       return this.setupIssue === null
     },
+    isVotingComplete(): boolean {
+      return this.players.every((player) => Boolean(this.votes[player.id]))
+    },
+    areFinalRolesComplete(): boolean {
+      const finalPlayerRoles = this.finalPlayerRoles ?? {}
+
+      return this.players.every((player) => Boolean(finalPlayerRoles[player.id]))
+    },
   },
   actions: {
+    setPlayerCount(playerCount: number) {
+      const normalizedPlayerCount = Math.max(3, Math.min(10, playerCount))
+      const nextPlayerNames = createDefaultPlayerNames(normalizedPlayerCount)
+
+      for (let index = 0; index < normalizedPlayerCount; index += 1) {
+        nextPlayerNames[index] = this.playerNames[index] ?? nextPlayerNames[index]
+      }
+
+      this.playerCount = normalizedPlayerCount
+      this.playerNames = nextPlayerNames
+      this.finalPlayerRoles = Object.fromEntries(
+        Object.entries(this.finalPlayerRoles ?? {}).filter(([playerId]) =>
+          Array.from(
+            { length: normalizedPlayerCount },
+            (_, index) => `player-${index + 1}`,
+          ).includes(playerId),
+        ),
+      )
+    },
+    setPlayerName(playerIndex: number, name: string) {
+      const playerNames = [...this.playerNames]
+      playerNames[playerIndex] = name
+      this.playerNames = playerNames
+    },
     setRoleCount(roleId: string, count: number) {
       const role = getRoleById(roleId)
 
@@ -135,6 +195,8 @@ export const useGameStore = defineStore('game', {
 
       this.phase = 'night'
       this.currentActionIndex = 0
+      this.votes = {}
+      this.votingResult = null
       this.nightQueue = getNightRoles(this.selectedRoles).map((role) => ({
         id: `night-${role.id}`,
         roleId: role.id,
@@ -149,14 +211,72 @@ export const useGameStore = defineStore('game', {
     },
     startDiscussion() {
       this.phase = 'day'
+      this.votes = {}
+      this.votingResult = null
+    },
+    setVote(voterId: string, targetId: string) {
+      if (voterId === targetId) {
+        return
+      }
+
+      this.votes = {
+        ...this.votes,
+        [voterId]: targetId,
+      }
+    },
+    clearVote(voterId: string) {
+      const votes = { ...this.votes }
+      delete votes[voterId]
+      this.votes = votes
+    },
+    setFinalPlayerRole(playerId: string, roleId: string) {
+      if (!roleId) {
+        const finalPlayerRoles = { ...(this.finalPlayerRoles ?? {}) }
+        delete finalPlayerRoles[playerId]
+        this.finalPlayerRoles = finalPlayerRoles
+        return
+      }
+
+      this.finalPlayerRoles = {
+        ...(this.finalPlayerRoles ?? {}),
+        [playerId]: roleId,
+      }
+    },
+    resolveVoting() {
+      const tally = this.players.reduce<Record<string, number>>((counts, player) => {
+        counts[player.id] = 0
+        return counts
+      }, {})
+
+      for (const targetId of Object.values(this.votes)) {
+        tally[targetId] = (tally[targetId] ?? 0) + 1
+      }
+
+      const maxVotes = Math.max(0, ...Object.values(tally))
+      const eliminatedPlayerIds =
+        maxVotes > 1
+          ? Object.entries(tally)
+              .filter(([, voteCount]) => voteCount === maxVotes)
+              .map(([playerId]) => playerId)
+          : []
+
+      this.votingResult = {
+        eliminatedPlayerIds,
+        maxVotes,
+        tally,
+      }
     },
     showResult() {
+      this.resolveVoting()
       this.phase = 'result'
     },
     resetGame() {
       this.phase = 'setup'
       this.currentActionIndex = 0
       this.nightQueue = []
+      this.votes = {}
+      this.votingResult = null
+      this.finalPlayerRoles = {}
     },
   },
 })

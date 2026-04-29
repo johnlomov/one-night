@@ -11,7 +11,7 @@ const {
   selectedRoleCounts,
   selectedRoleCount,
   requiredRoleCount,
-  playerCount,
+  playerNames,
   delayBetweenRoles,
   discussionDuration,
   setupIssue,
@@ -27,6 +27,11 @@ function getSelectedRoleCount(roleId: string) {
   return selectedRoleCounts.value[roleId] ?? 0
 }
 
+function updatePlayerCount(event: Event) {
+  const input = event.target as HTMLInputElement
+  game.setPlayerCount(Number(input.value))
+}
+
 function startGame() {
   if (!canStartGame.value) {
     return
@@ -40,7 +45,7 @@ function startGame() {
 <template>
   <section class="screen">
     <div class="screen-header">
-      <p class="eyebrow">Этап 3</p>
+      <p class="eyebrow">Перед партией</p>
       <h1>Настройка партии</h1>
     </div>
 
@@ -104,8 +109,27 @@ function startGame() {
 
         <label class="field">
           <span>Игроки</span>
-          <input v-model.number="playerCount" min="3" max="10" type="number" />
+          <input
+            :value="game.playerCount"
+            min="3"
+            max="10"
+            type="number"
+            @input="updatePlayerCount"
+          />
         </label>
+
+        <section class="player-name-list" aria-labelledby="player-name-list-title">
+          <h3 id="player-name-list-title">Имена игроков</h3>
+          <label v-for="(_, index) in playerNames" :key="index" class="field">
+            <span>Игрок {{ index + 1 }}</span>
+            <input
+              :value="playerNames[index]"
+              maxlength="24"
+              type="text"
+              @input="game.setPlayerName(index, ($event.target as HTMLInputElement).value)"
+            />
+          </label>
+        </section>
 
         <label class="field">
           <span>Пауза между ролями</span>

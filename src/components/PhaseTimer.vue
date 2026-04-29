@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
+import { useTimerSounds } from '@/composables/useTimerSounds'
+
 const props = defineProps<{
   duration: number
   isRunning: boolean
@@ -13,6 +15,7 @@ const emit = defineEmits<{
 
 const remainingMs = ref(props.duration)
 const lastBeepSecond = ref<number | null>(null)
+const { playTimeUpTone, playWarningTone } = useTimerSounds()
 let intervalId: number | undefined
 
 const remainingSeconds = computed(() => Math.ceil(remainingMs.value / 1000))
@@ -38,33 +41,6 @@ function clearTimer() {
   }
 }
 
-function playWarningTone() {
-  const AudioContext =
-    window.AudioContext ||
-    (window as Window & { webkitAudioContext?: typeof window.AudioContext }).webkitAudioContext
-
-  if (!AudioContext) {
-    return
-  }
-
-  const audioContext = new AudioContext()
-  const oscillator = audioContext.createOscillator()
-  const gain = audioContext.createGain()
-  const startTime = audioContext.currentTime
-
-  oscillator.type = 'sine'
-  oscillator.frequency.setValueAtTime(660, startTime)
-  gain.gain.setValueAtTime(0.0001, startTime)
-  gain.gain.exponentialRampToValueAtTime(0.08, startTime + 0.015)
-  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.18)
-
-  oscillator.connect(gain)
-  gain.connect(audioContext.destination)
-  oscillator.start(startTime)
-  oscillator.stop(startTime + 0.2)
-  oscillator.onended = () => void audioContext.close()
-}
-
 function startTimer() {
   clearTimer()
 
@@ -79,6 +55,7 @@ function startTimer() {
 
     if (remainingMs.value === 0) {
       clearTimer()
+      playTimeUpTone()
       emit('complete')
     }
   }, 100)
@@ -123,11 +100,15 @@ onBeforeUnmount(clearTimer)
 </script>
 
 <template>
-  <div class="phase-timer" role="timer" :aria-label="`Осталось ${remainingSeconds} секунд`">
-    <div class="phase-timer__track">
-      <span class="phase-timer__bar" :style="{ width: `${progress}%` }" />
+  <div>
+    <div class="phase-timer" role="timer" :aria-label="`Осталось ${remainingSeconds} секунд`">
+      <div class="phase-timer__track">
+        <span class="phase-timer__bar" :style="{ width: `${progress}%` }" />
+      </div>
+      <strong>{{ remainingSeconds }}</strong>
     </div>
-    <strong>{{ remainingSeconds }}</strong>
-    <span v-if="urgencySecond" class="phase-timer__warning">{{ urgencySecond }}</span>
+    <div v-if="urgencySecond" class="countdown-overlay" aria-live="assertive">
+      <span :key="urgencySecond">{{ urgencySecond }}</span>
+    </div>
   </div>
 </template>
