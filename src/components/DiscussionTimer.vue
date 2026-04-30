@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
 
+import { useAudioController } from '@/composables/useAudioController'
 import { useTimerSounds } from '@/composables/useTimerSounds'
 
 const props = defineProps<{
@@ -13,8 +14,10 @@ const emit = defineEmits<{
 
 const remainingSeconds = ref(props.duration)
 const isRunning = ref(false)
+const hasAnnouncedOneMinute = ref(false)
 const hasPlayedFinalWarning = ref(false)
 const lastBeepSecond = ref<number | null>(null)
+const audio = useAudioController()
 const { playDiscussionWarningTone, playTimeUpTone, playWarningTone } = useTimerSounds()
 let intervalId: number | undefined
 
@@ -59,6 +62,7 @@ function startTimer() {
 
   if (remainingSeconds.value === 0) {
     remainingSeconds.value = props.duration
+    hasAnnouncedOneMinute.value = false
     hasPlayedFinalWarning.value = false
     lastBeepSecond.value = null
   }
@@ -67,6 +71,11 @@ function startTimer() {
   clearTimer()
   intervalId = window.setInterval(() => {
     remainingSeconds.value = Math.max(0, remainingSeconds.value - 1)
+
+    if (remainingSeconds.value === 60 && !hasAnnouncedOneMinute.value) {
+      hasAnnouncedOneMinute.value = true
+      void audio.speak('Осталась одна минута на обсуждение.')
+    }
 
     if (remainingSeconds.value === 15 && !hasPlayedFinalWarning.value) {
       hasPlayedFinalWarning.value = true
@@ -94,21 +103,28 @@ function startTimer() {
 function pauseTimer() {
   isRunning.value = false
   clearTimer()
+  audio.pause()
 }
 
 function resetTimer() {
   pauseTimer()
   remainingSeconds.value = props.duration
+  hasAnnouncedOneMinute.value = false
   hasPlayedFinalWarning.value = false
   lastBeepSecond.value = null
+  audio.stop()
 }
 
 function completeDiscussion() {
   pauseTimer()
+  audio.stop()
   emit('complete')
 }
 
-onBeforeUnmount(clearTimer)
+onBeforeUnmount(() => {
+  clearTimer()
+  audio.stop()
+})
 </script>
 
 <template>
