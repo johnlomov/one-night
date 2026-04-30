@@ -645,6 +645,45 @@ h1 {
   font-weight: 800;
 }
 
+.install-prompt {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  width: min(560px, calc(100% - 32px));
+  border: 1px solid rgba(240, 199, 110, 0.38);
+  border-radius: 8px;
+  padding: 16px;
+  background: #181716;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.42);
+}
+
+.install-prompt strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.install-prompt p {
+  margin: 0;
+  color: #d8d1c4;
+  line-height: 1.35;
+}
+
+.install-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.install-prompt__actions button {
+  min-height: 44px;
+}
+
 .result-layout {
   display: grid;
   gap: 24px;
@@ -846,5 +885,17 @@ h1 {
   .voting-modal__footer {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .install-prompt {
+    grid-template-columns: 1fr;
+  }
+
+  .install-prompt__actions {
+    justify-content: stretch;
+  }
+
+  .install-prompt__actions button {
+    flex: 1 1 140px;
   }
 }

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+
+import PwaInstallPrompt from '@/components/PwaInstallPrompt.vue'
 </script>
 
 <template>
@@ -17,5 +19,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <main class="app-main">
       <RouterView />
     </main>
+
+    <PwaInstallPrompt />
   </div>
 </template>

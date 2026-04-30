@@ -10,7 +10,15 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/app-icon.svg', 'icons/maskable-icon.svg'],
+      includeAssets: [
+        'favicon.svg',
+        'icons/app-icon.svg',
+        'icons/maskable-icon.svg',
+        'icons/icon-192.png',
+        'icons/icon-512.png',
+        'icons/maskable-512.png',
+        'icons/apple-touch-icon.png',
+      ],
       manifest: {
         name: 'One Night',
         short_name: 'One Night',
@@ -18,11 +26,30 @@ export default defineConfig({
         theme_color: '#141414',
         background_color: '#141414',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait',
         scope: '/one-night/',
         start_url: '/one-night/',
         lang: 'ru',
         icons: [
+          {
+            src: '/one-night/icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/one-night/icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/one-night/icons/maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
           {
             src: '/one-night/icons/app-icon.svg',
             sizes: 'any',
