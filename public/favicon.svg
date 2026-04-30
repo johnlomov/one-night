@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="One Night favicon">
+  <rect width="64" height="64" rx="14" fill="#141414"/>
+  <path d="M49 13c-5 1-9 4-13 8-6 7-6 17 1 23 3 3 6 4 10 5-5 3-10 5-16 4-12-2-21-13-19-25C14 17 25 8 37 10c5 1 9 2 12 3Z" fill="#f0c76e"/>
+  <path d="M22 39c3 4 8 7 13 7 4 0 7-1 10-3-2 5-7 9-13 9-8 0-14-6-14-14 0-3 1-6 3-8 0 3 0 6 1 9Z" fill="#f7f2e8" opacity=".92"/>
+  <circle cx="42" cy="22" r="3" fill="#f7f2e8"/>
+</svg>

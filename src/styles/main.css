@@ -250,7 +250,7 @@ h1 {
   background: #d8b4ef;
 }
 
-.role-stepper {
+.counter-stepper {
   display: grid;
   grid-template-columns: 36px 32px 36px;
   align-items: center;
@@ -268,7 +268,7 @@ h1 {
   font-weight: 900;
 }
 
-.role-stepper output {
+.counter-stepper output {
   min-width: 32px;
   color: #f7f2e8;
   font-weight: 800;
@@ -305,6 +305,17 @@ h1 {
   padding: 0 12px;
   color: #f7f2e8;
   background: #1f1f1f;
+}
+
+.player-count-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.player-count-stepper span {
+  color: #d8d1c4;
 }
 
 .player-name-list {

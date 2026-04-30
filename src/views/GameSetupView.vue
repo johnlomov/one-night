@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import CounterStepper from '@/components/CounterStepper.vue'
 import { roleTeamLabels, roles } from '@/config/roles'
 import { useGameStore } from '@/stores/game'
 
@@ -25,11 +26,6 @@ const nightRoleCount = computed(
 
 function getSelectedRoleCount(roleId: string) {
   return selectedRoleCounts.value[roleId] ?? 0
-}
-
-function updatePlayerCount(event: Event) {
-  const input = event.target as HTMLInputElement
-  game.setPlayerCount(Number(input.value))
 }
 
 function startGame() {
@@ -77,25 +73,14 @@ function startGame() {
                   {{ roleTeamLabels[role.team] }}
                 </span>
               </div>
-              <div class="role-stepper" :aria-label="`Количество карт: ${role.name}`">
-                <button
-                  type="button"
-                  class="icon-button"
-                  :disabled="getSelectedRoleCount(role.id) === 0"
-                  @click="game.decrementRole(role.id)"
-                >
-                  −
-                </button>
-                <output>{{ getSelectedRoleCount(role.id) }}</output>
-                <button
-                  type="button"
-                  class="icon-button"
-                  :disabled="getSelectedRoleCount(role.id) === role.maxCount"
-                  @click="game.incrementRole(role.id)"
-                >
-                  +
-                </button>
-              </div>
+              <CounterStepper
+                :decrement-disabled="getSelectedRoleCount(role.id) === 0"
+                :increment-disabled="getSelectedRoleCount(role.id) === role.maxCount"
+                :label="`Количество карт: ${role.name}`"
+                :value="getSelectedRoleCount(role.id)"
+                @decrement="game.decrementRole(role.id)"
+                @increment="game.incrementRole(role.id)"
+              />
             </header>
             <p>{{ role.description }}</p>
           </article>
@@ -107,16 +92,17 @@ function startGame() {
           <h2 id="setup-sidebar-title">Параметры</h2>
         </div>
 
-        <label class="field">
+        <div class="player-count-stepper">
           <span>Игроки</span>
-          <input
+          <CounterStepper
+            :decrement-disabled="game.playerCount <= 3"
+            :increment-disabled="game.playerCount >= 10"
+            label="Количество игроков"
             :value="game.playerCount"
-            min="3"
-            max="10"
-            type="number"
-            @input="updatePlayerCount"
+            @decrement="game.setPlayerCount(game.playerCount - 1)"
+            @increment="game.setPlayerCount(game.playerCount + 1)"
           />
-        </label>
+        </div>
 
         <section class="player-name-list" aria-labelledby="player-name-list-title">
           <h3 id="player-name-list-title">Имена игроков</h3>
