@@ -71,7 +71,7 @@ async function playAction() {
   timerKey.value += 1
   status.value = 'speaking'
 
-  await audio.speak(props.action.instruction)
+  await audio.speak(props.action.speechText)
 
   if (activeRunId.value !== runId) {
     return

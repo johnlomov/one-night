@@ -16,6 +16,7 @@ export interface NightAction {
   roleId: string
   title: string
   instruction: string
+  speechText: string
 }
 
 export interface Player {
@@ -75,6 +76,10 @@ function createRandomRoles(requiredRoleCount: number) {
 
 function createDefaultPlayerNames(playerCount: number) {
   return Array.from({ length: playerCount }, (_, index) => `Игрок ${index + 1}`)
+}
+
+function createNightSpeechText(text: string) {
+  return text.replace(/проснись/g, 'просни́сь').replace(/проснитесь/g, 'просни́тесь')
 }
 
 export const useGameStore = defineStore('game', {
@@ -202,6 +207,7 @@ export const useGameStore = defineStore('game', {
         roleId: role.id,
         title: role.name,
         instruction: role.nightAction,
+        speechText: createNightSpeechText(role.nightAction),
       }))
     },
     nextAction() {
